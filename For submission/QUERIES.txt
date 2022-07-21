@@ -1,0 +1,143 @@
+1
+INSERT INTO Category (CategoryID, NAme, CategoryType) VALUES ();
+
+
+
+2
+DELETE FROM Category WHERE CategoryID =
+
+
+
+3
+CREATE OR REPLACE VIEW CategorySummary
+AS SELECT
+	Category.Name AS Name,
+	COUNT(Book.CategoryID) AS Occurences,
+	ROUND(AVG(Price),2) AS AveragePrice
+FROM
+	Category
+LEFT JOIN Book ON 
+	Book.CategoryID = Category.CategoryID
+GROUP BY
+	Category.CategoryID;
+
+SELECT
+	ROUND(SUM(AveragePrice),2)
+FROM
+	CategorySummary
+
+
+4
+SELECT
+	OrderLine.bookid AS "BookID",
+	title AS "Book Title",
+	count(OrderLine.bookid) AS "Total Orders",
+	sum(quantity) AS "Total quantity",
+	sum(price*quantity) AS "Total Price",
+	sum(unitsellingprice*quantity) AS "Total Unit Selling Price",
+	to_char(OrderDate, 'mm') AS "Month",
+	to_char(OrderDate, 'yyyy') AS "Year"
+FROM
+	Publisher
+	JOIN Book ON Book.PublisherID = Publisher.PublisherID
+	JOIN OrderLine ON OrderLine.BookID = Book.bookID
+	Join ShopOrder ON ShopOrder.ShopOrderID = OrderLine.ShopOrderID
+
+WHERE
+	LOWER(Publisher.name) = LOWER('Oxford')
+GROUP BY
+	"Month",
+	"Year",
+	title,
+	OrderLine.bookid
+ORDER BY
+	"Year" DESC,
+	"Month"
+
+
+
+
+5
+CREATE OR REPLACE VIEW bookHistory
+AS SELECT
+	OrderDate AS OrderDate,
+	Title AS BookTitle,
+	Price AS Price,
+	UnitSellingPrice AS UnitSellingPrice,
+	SUM(Quantity) AS TotalQuantity,
+	Quantity*UnitSellingPrice AS TotalSellingValue,
+	Shop.Name AS ShopName
+FROM
+	Shop
+JOIN ShopOrder ON ShopOrder.ShopID=Shop.ShopID
+JOIN OrderLine ON OrderLine.ShopOrderID=ShopOrder.ShopOrderID
+JOIN Book ON Book.BookID=OrderLine.BookID
+JOIN Publisher ON Publisher.PublisherID=Book.PublisherID
+JOIN SalesRep ON SalesRep.SalesRepID=ShopOrder.SalesRepID
+WHERE
+	Book.BookID =
+GROUP BY
+	ShopOrder.OrderDate,
+	Book.Title,
+	Book.Price,
+	OrderLine.UnitSellingPrice,
+	OrderLine.Quantity,
+	Shop.Name
+ORDER BY
+	OrderDate
+
+SELECT
+	SUM(TotalSellingValue) AS CompleteTotalValue,
+	SUM(TotalQuantity) AS CompleteTotalQuantity
+FROM
+	bookHistory
+
+
+
+
+
+6
+
+SELECT
+	table2.salesrepID,
+	table2.salesrep,
+	COALESCE(table1.totalquantity,0) AS TotalQuantity,
+	COALESCE(table1.totalordervalue,0) AS TotalOrderValue
+		FROM
+	(SELECT
+		SalesRep.SalesRepID,
+		COALESCE(SUM(OrderLine.Quantity),0) AS TotalQuantity,
+		COALESCE(SUM(OrderLine.UnitSellingPrice*OrderLine.Quantity),0) AS TotalOrderValue
+	FROM
+		SalesRep
+	JOIN ShopOrder ON ShopOrder.SalesRepID=SalesRep.SalesRepID
+	JOIN OrderLine ON OrderLine.ShopOrderID=ShopOrder.ShopOrderID
+	WHERE
+		ShopOrder.OrderDate BETWEEN '2015-1-1' AND '2019-1-1'
+	GROUP BY
+		SalesRep.SalesRepID
+	ORDER BY
+		COALESCE(SUM(OrderLine.UnitSellingPrice),0) DESC) table1
+	RIGHT JOIN
+	(SELECT
+		SalesRepID,
+		name AS salesrep
+	FROM salesrep)table2 ON table1.salesrepid=table2.salesrepid
+	GROUP BY
+		table2.salesrepid,
+		table2.salesrep,
+		table1.totalquantity,
+		table1.totalordervalue
+	ORDER BY
+		COALESCE(sum(table1.totalOrderValue),0)DESC;
+
+
+
+7
+
+UPDATE
+	book
+SET
+	Price = (Price-(Price*20)/100)
+WHERE
+	CategoryID = ;

@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+
+    <title>Database Homepage</title>
+
+    <!link type="text/css" rel="stylesheet" href="/static/styles/homestyle.css">
+    <!script src="/static/homescript.js">
+    <!/script>
+</head>
+
+<body>
+
+    <div id="wrapper">
+        <form action="home" method="get">
+            <input type="submit" value="Back to homePage">
+        </form>
+        <h2>Book History</h2>
+
+        <table border=1>
+            <tr>
+                <th>Sales Rep ID</th>
+                <th>Sales Rep Name</th>
+                <th>Quantity</th>
+                <th>Value</th>
+            </tr>
+            {% for row in rep %}
+            <tr>
+                {% for item in row%}
+                <td>
+                    {{item}}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

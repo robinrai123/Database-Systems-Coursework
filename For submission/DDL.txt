@@ -1,0 +1,104 @@
+DROP TABLE Category CASCADE;
+DROP TABLE Shop CASCADE;
+DROP TABLE Publisher CASCADE;
+DROP TABLE Book CASCADE;
+DROP TABLE SalesRep CASCADE;
+DROP TABLE ShopOrder CASCADE;
+DROP TABLE OrderLine CASCADE;
+
+CREATE TABLE Category
+(
+	CategoryID		INTEGER,
+	Name			VARCHAR(50),
+	CategoryType 		VARCHAR(20)
+		CHECK (LOWER(CategoryType) IN ('fiction','non-fiction')),
+		/*Ensures CategoryType is fiction or non-fiction, case insensitive as trigger will format the case.*/
+	PRIMARY KEY (CategoryID)
+);
+
+CREATE TABLE SalesRep
+(
+	SalesRepID		INTEGER,
+	Name			VARCHAR(50),
+	PRIMARY KEY (SalesRepID)
+);
+
+CREATE TABLE Shop
+(
+	ShopID			INTEGER,
+	Name			VARCHAR(50),
+	PRIMARY KEY (ShopID)
+);
+
+CREATE TABLE Publisher
+(
+	PublisherID		INTEGER,
+	Name			VARCHAR(50),
+	PRIMARY KEY (PublisherID)
+);
+
+CREATE TABLE Book
+(
+	BookID			INTEGER,
+	Title			VARCHAR(50),
+	Price			DECIMAL(10,2)
+		CHECK (Price >0),
+		/*can't sell a book for nothing*/
+	CategoryID		INTEGER,
+	PublisherID		INTEGER,
+	PRIMARY KEY (BookID),
+	FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID) ON DELETE SET NULL,
+	/*Set null as book will still exist without a category*/
+	FOREIGN KEY (PublisherID) REFERENCES Publisher(PublisherID) ON DELETE RESTRICT
+	/*Prevents deletion since a publisher is a necessary part of a book*/
+);
+
+CREATE TABLE ShopOrder
+(
+	ShopOrderID		INTEGER,
+	OrderDate		DATE,
+	ShopID			INTEGER,
+	SalesRepID		INTEGER,
+	PRIMARY KEY (ShopOrderID),
+	FOREIGN KEY (ShopID) REFERENCES Shop(ShopID) ON DELETE CASCADE,
+	/*If there's no shop there's no orders from it*/
+	FOREIGN KEY (SalesRepID) REFERENCES SalesRep(SalesRepID) ON DELETE SET NULL
+	/*If there's no salesrep the order can still be made*/
+);
+CREATE TABLE Orderline
+(
+	ShopOrderID		INTEGER,
+	BookID			INTEGER,
+	Quantity		INTEGER,
+		CHECK (Quantity >0),
+		/*Can't have an order with no books*/
+	UnitSellingPrice	DECIMAL (10,2),
+		CHECK (UnitSellingPrice >0),
+		/*Can't sell a book for nothing*/
+	PRIMARY KEY (ShopOrderID, BookID),
+	FOREIGN KEY (ShopOrderID) REFERENCES ShopOrder(ShopOrderID) ON DELETE CASCADE,
+	/*A deleted order can't be on a line of orders*/
+	FOREIGN KEY (BookID) REFERENCES Book(BookID) ON DELETE CASCADE
+	/*Can't have an order without books*/
+);
+
+CREATE OR REPLACE FUNCTION updateCategory()
+RETURNS trigger AS $$
+BEGIN
+	IF (LOWER(NEW.CategoryType)='fiction') THEN
+		UPDATE  category SET categoryType = 'fiction' WHERE categoryID=NEW.categoryID;
+		/*If fiction update the categorytype to fiction but with correct case*/
+	ELSE
+		UPDATE  category SET categoryType = 'non-Fiction' WHERE categoryID=NEW.categoryID;
+		/*If non-fiction update the categorytype to non-fiction but with correct case*/
+END IF;
+RETURN NEW;
+END; $$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS categoryTypeFormat
+  ON public.category;
+CREATE TRIGGER categoryTypeFormat
+AFTER INSERT ON Category
+FOR EACH ROW
+execute procedure updateCategory();
+/*Trigger to format category type case*/

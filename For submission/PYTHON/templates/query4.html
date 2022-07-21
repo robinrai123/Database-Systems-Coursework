@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+
+    <title>Database Homepage</title>
+
+    <!link type="text/css" rel="stylesheet" href="/static/styles/homestyle.css">
+    <!script src="/static/homescript.js">
+    <!/script>
+</head>
+
+<body>
+
+    <div id="wrapper">
+        <form action="home" method="get">
+            <input type="submit" value="Back to homePage">
+        </form>
+        <h2>Order Summary</h2>
+
+        <table border=1>
+            <tr>
+                <th>BookID</th>
+                <th>Book Title</th>
+                <th>Total Orders Per Book</th>
+                <th>Total Quantity Per Book</th>
+                <th>Total Price</th>
+                <th>Total Unit Price</th>
+                <th>Month</th>
+				<th>Year</th>
+            </tr>
+            {% for row in rows %}
+            <tr>
+                {% for item in row%}
+                <td>
+                    {{item}}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

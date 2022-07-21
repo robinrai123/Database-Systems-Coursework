@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+
+    <title>Database Homepage</title>
+
+    <!link type="text/css" rel="stylesheet" href="/static/styles/homestyle.css">
+    <!script src="/static/homescript.js">
+    <!/script>
+</head>
+
+<body>
+
+    <div id="wrapper">
+        <p id="failMessage">{{failMessage}}</p>
+        <p id="errorMessage">{{error}}</p>
+        <p id="successMessage">{{successMessage}}</p>
+
+        <h2> Query 1 </h2>
+        <form action="Query1" method="post">
+            <input type="text" name="categoryID" placeholder="Give a CategoryID.">
+            <input type="text" name="categoryName" placeholder="Give the name for the category." style="width:15rem;">
+            <select name="categoryType">
+                <option value="fiction">Fiction</option>
+                <option value="Non-fiction">Non-Fiction</option>
+            </select>
+            <input type="submit" value="Submit">
+        </form>
+
+        <h2> Query 2 </h2>
+        <form action="Query2" method="post">
+            <input type="text" name="categoryID" placeholder="Give a CategoryID to delete.">
+            <input type="submit" value="Delete Category">
+        </form>
+
+        <h2> Query 3 </h2>
+        <form action="Query3" method="get">
+            <input type="submit" value="View category summary">
+        </form>
+
+        <h2> Query 4 </h2>
+        <form action="Query4" method="post">
+            <input type="text" name="publisherName" placeholder="Give a publisher name to report." style="width:15rem;">
+            <input type="submit" value="Submit">
+        </form>
+
+        <h2> Query 5 </h2>
+        <form action="Query5" method="post">
+            <input type="text" name="bookID" placeholder="Give a BookID to report.">
+            <input type="submit" value="Submit">
+        </form>
+
+        <h2> Query 6 </h2>
+        <form action="Query6" method="post">
+            <input type="date" name="dateStart">
+            <input type="date" name="dateEnd">
+            <input type="submit" value="Submit">
+        </form>
+
+        <h2> Query 7 </h2>
+        <form action="Query7" method="post">
+            <input type="text" name="categoryID" placeholder="Give a CategoryID to discount." style="width:15rem;">
+            <input type="number" name="percent" max="100" min="0" placeholder="Give a percentage to discount it by."style="width:15rem;">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>
